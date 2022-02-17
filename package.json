@@ -1,0 +1,26 @@
+{
+  "name": "league-of-billions",
+  "version": "1.0.0",
+  "description": "FPL league space",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Odizee and Paul Keno",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^7.6.1",
+    "amqp-connection-manager": "^4.1.1",
+    "amqplib": "^0.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "helmet": "^5.0.2",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "mongoose": "^6.2.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.15"
+  }
+}
