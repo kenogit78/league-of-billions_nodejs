@@ -1,13 +1,16 @@
 const moment = require('moment')
-const bcrypt = require('bcrypt')
-
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken');
 const User = require('../models/user')
 const Verification = require('../models/verification')
 const responseHandler = require('../utils/response')
-const {publish} = require('../utils/publisher')
+const sendgrid = require('../email')
+const nodemailer = require('../nodemailer')
+const config = require('../config')
+// const {publish} = require('../utils/publisher')
 
 exports.register = async(req, res) => {
-    const {email, password, phone} = req.body
+    const {email, password, phone, firstname } = req.body
     const passwordHash = User.getHashPassword(password)
     let user = await User.create({email, phone, password: passwordHash})
     const otp = User.getOTP()
@@ -17,22 +20,54 @@ exports.register = async(req, res) => {
         user: user.id, code: otp, account, type: 'account_verification', expired_at: moment().add(1, 'hour')
     })
     console.log('account', account)
-    const qMessage = {
-        event: 'notification',
-        action: 'SEND_ACCOUNT_VERIFICATION',
-        data: {
-            notification,
+
+    const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+        expiresIn: '1d',
+      });
+
+      const url = `${process.env.BASEURL}/auth/verification/${token}`;
+
+    const mailOptions = {
+            from: config.emailUser,
             to: account,
             subject: 'Verify Your Account',
-            payload: {otp}
+            html: ` <h2> ${firstname}, Thank you for signing up </h2>
+                    <h4> Please verify your mail to continue </h4>
+                  <p>Please click this link to verify yourself. <a href="${url}">${url}</a></p>
+            `
         }
-    }
-    await publish('email.notification', qMessage)
+
+        nodemailer.Transport(mailOptions)
+
+    // await sendgrid.emailService(qMessage)
+    // await publish('email.notification', qMessage)
     return responseHandler.sendSuccess(res, {
         message: 'Account created successfully.',
         data: user
     })
+
+    
 }
+
+
+exports.userEmailVerify = async (req, res) => {
+    const { id } = jwt.verify(req.params.token, process.env.SECRET_KEY);
+    console.log(id)
+    if (id) {
+      const updatedUser = await User.findByIdAndUpdate(id, { confirmed: true });
+      if (updatedUser) {
+        // return res.redirect(`http://localhost:3000/login`);        // localhost
+        return res.redirect(`${process.env.PROD_SITE}`);         
+      } else {
+        res.status(404);
+        throw new Error('User not found!');
+      }
+    } else {
+      res.status(404);
+      throw new Error('User not found!');
+    }
+  }
+
 
 exports.verifyEmail = async (req, res) => {
     const {otp, account} = req.body
@@ -76,17 +111,17 @@ exports.resendEmail = async (req, res) => {
             user: user.id,
             code: otp, expired_at: moment().add(1, 'hour'), account, type: 'account_verification'
         }, {upsert: true}).exec()
-        const qMessage = {
-            event: 'notification',
-            action: 'SEND_ACCOUNT_VERIFICATION',
-            data: {
-                notification,
-                to: account,
-                subject: 'Verify Your Account',
-                payload: {otp}
-            }
-        }
-        await publish('email.notification', qMessage)
+        // const qMessage = {
+        //     event: 'notification',
+        //     action: 'SEND_ACCOUNT_VERIFICATION',
+        //     data: {
+        //         notification,
+        //         to: account,
+        //         subject: 'Verify Your Account',
+        //         payload: {otp}
+        //     }
+        // }
+        // await publish('email.notification', qMessage)
     }
     return responseHandler.sendSuccess(res, {
         message: 'OTP sent successfully.'
@@ -143,10 +178,10 @@ exports.forgotPassword = async (req, res) => {
                 payload: {token}
             }
         }
-        await publish(notification, qMessage)
-        return responseHandler.sendSuccess(res, {
-            message: 'Password reset link sent successfully.'
-        })
+        // await publish(notification, qMessage)
+        // return responseHandler.sendSuccess(res, {
+        //     message: 'Password reset link sent successfully.'
+        // })
     }
     return responseHandler.sendSuccess(res, {
         message: 'No account found for this account.'

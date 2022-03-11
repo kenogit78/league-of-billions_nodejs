@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-// const mongoosePaginate = require('mongoose-paginate-v2');
+const mongoosePaginate = require('mongoose-paginate-v2');
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 
 const config = require('../config')
 
@@ -13,16 +13,38 @@ const user = new Schema({
     lastname: String,
     email: {type: String},
     password: String,
-    username: String,
-    phone: String,
-    profile_picture: String,
-    bio: String,
-    location: String,
-    country: String,
-    date_of_birth: Date,
     account_verified: Boolean,
     account_verified_at: Date,
     status: {type: String, enum: statuses}
+}, {
+    timestamps: {createdAt: 'created_at', updatedAt: 'updated_at', deleted_at: 'deleted_at'}
 })
+user.methods.toJSON = function () {
+    const obj = this.toObject();
+    delete obj.__v;
+    obj.id = obj._id;
+    delete obj._id;
+    return obj;
+};
 
+user.statics = {
+    getOTP() {
+      return Math.floor(1000 + Math.random() * 9000)
+    },
+    generateToken(user) {
+        const token = jwt.sign(user, config.secret)
+        this.findByIdAndUpdate(user.id, {$addToSet: {tokens: token}}).exec()
+        return token
+    },
+    getHashPassword(password) {
+        const salt = bcrypt.genSaltSync()
+        return bcrypt.hashSync(password, salt)
+    },
+    hashPassword(password) {
+        const token = this.getHashPassword(password)
+        return token.replace(/\//g, '-')
+    }
+}
+
+user.plugin(mongoosePaginate);
 module.exports = mongoose.model('User', user)

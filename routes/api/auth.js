@@ -4,9 +4,10 @@ const router = express.Router()
 const authController = require('../../controllers/authentications')
 const validate = require('../../middlewares/validate')
 const auth = require('../../middlewares/authenticate')
-const {register,login, reset, resendEmail,changePassword,verifyEmail, forgotPassword} = require('../../validations/authentications')
+const {register, login, reset, resendEmail,changePassword,verifyEmail, forgotPassword} = require('../../validations/authentications')
 
 router.post('/register', validate(register), authController.register)
+router.get('/verification/:token', authController.userEmailVerify);
 router.post('/verify/account', validate(verifyEmail), authController.verifyEmail)
 router.post('/resend/', validate(resendEmail), authController.resendEmail)
 router.post('/login', validate(login), authController.login)
