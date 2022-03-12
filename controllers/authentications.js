@@ -14,8 +14,8 @@ exports.register = async(req, res) => {
     const passwordHash = User.getHashPassword(password)
     let user = await User.create({email, phone, password: passwordHash})
     const otp = User.getOTP()
-    let account = email ? email : phone
-    const notification = email ? 'email' : 'sms'
+    let account = email 
+    // const notification = email ? 'email' : 'sms'
     await Verification.create({
         user: user.id, code: otp, account, type: 'account_verification', expired_at: moment().add(1, 'hour')
     })

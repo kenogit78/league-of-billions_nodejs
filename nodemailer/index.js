@@ -5,7 +5,7 @@ const config = require('../config')
 const Transport = async ( data) => {
  
 
-    const mailOptions  = data
+   
 const transporter = nodemailer.createTransport({
     service: 'gmail',
 
@@ -22,17 +22,17 @@ transporter.verify((error, success) => {
         console.log('Ready for message')
     }
 })
-console.log(Object.assign({}, mailOptions));
 
-transporter.sendMail(mailOptions, 
+
+transporter.sendMail(data, 
     
     function(error, info){
-    console.log(mailOptions)
+    console.log(data)
     if(error){
         console.log(error)
     }
     else{
-        console.log('verification successful')
+        console.log('email sent successful')
     }
 })
 
