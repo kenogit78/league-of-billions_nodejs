@@ -3,8 +3,16 @@ const config = require('../config')
 
 
 const Transport = async ( data) => {
- 
-
+  
+    console.log(data)
+    // const transporter = nodemailer.createTransport({
+    //     host: "smtp.mailtrap.io",
+    //     port: 2525,
+    //     auth: {
+    //       user: "e85d7fc7e3bf2e",
+    //       pass: "396dd31a5fb9fc"
+    //     }
+    //   });
    
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -12,7 +20,8 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: config.emailUser,
         pass: config.emailPass
-    }
+    },
+ 
 })
 
 transporter.verify((error, success) => {

@@ -3,6 +3,7 @@ require('dotenv').config()
 module.exports = {
     appName: process.env.APP_NAME || 'league-of-billions',
     env: process.env.NODE_ENV,
+    secret: process.env.SECRET_KEY,
     port: process.env.PORT,
     sendgrid: process.env.SENDGRID_KEY,
     sendgridEmail: process.env.SENDGRID_EMAIL,

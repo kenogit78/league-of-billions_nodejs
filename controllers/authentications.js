@@ -28,7 +28,7 @@ exports.register = async(req, res) => {
       const url = `${process.env.BASEURL}/auth/verification/${token}`;
 
     const mailOptions = {
-            from: config.emailUser,
+            from: `FPL HUB <${config.emailUser}>`,
             to: account,
             subject: 'Verify Your Account',
             html: ` <h2> ${firstname}, Thank you for signing up </h2>
@@ -52,7 +52,7 @@ exports.register = async(req, res) => {
 
 exports.userEmailVerify = async (req, res) => {
     const { id } = jwt.verify(req.params.token, process.env.SECRET_KEY);
-    console.log(id)
+    
     if (id) {
       const updatedUser = await User.findByIdAndUpdate(id, { confirmed: true });
       if (updatedUser) {
