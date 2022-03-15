@@ -10,9 +10,9 @@ const config = require('../config')
 // const {publish} = require('../utils/publisher')
 
 exports.register = async(req, res) => {
-    const {email, password, phone, firstname } = req.body
+    const {fullname, email, phone_number, username, password} = req.body
     const passwordHash = User.getHashPassword(password)
-    let user = await User.create({email, phone, password: passwordHash})
+    let user = await User.create({fullname, email, phone_number, password: passwordHash})
     const otp = User.getOTP()
     let account = email 
     // const notification = email ? 'email' : 'sms'
