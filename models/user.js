@@ -9,9 +9,10 @@ const Schema =  mongoose.Schema
 
 const statuses = ['active', 'blocked', 'suspended', 'deleted']
 const user = new Schema({
-    firstname: String,
-    lastname: String,
+    fullname: String,
     email: {type: String},
+    phone_number: Number,
+    username: {type: Mixed},
     password: String,
     account_verified: Boolean,
     account_verified_at: Date,
