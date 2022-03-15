@@ -15,7 +15,7 @@ const Transport = async ( data) => {
     //   });
    
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'hotmail',
 
     auth: {
         user: config.emailUser,

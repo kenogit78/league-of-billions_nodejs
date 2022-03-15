@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user')
 const Verification = require('../models/verification')
 const responseHandler = require('../utils/response')
-const sendgrid = require('../email')
-const nodemailer = require('../nodemailer')
+// const sendgrid = require('../email')
+// const nodemailer = require('../nodemailer')
 const config = require('../config')
 // const {publish} = require('../utils/publisher')
 
@@ -21,23 +21,23 @@ exports.register = async(req, res) => {
     })
     console.log('account', account)
 
-    const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-        expiresIn: '1d',
-      });
+    // const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+    //     expiresIn: '1d',
+    //   });
 
-      const url = `${process.env.BASEURL}/auth/verification/${token}`;
+    //   const url = `${process.env.BASEURL}/auth/verification/${token}`;
 
-    const mailOptions = {
-            from: `FPL HUB <${config.emailUser}>`,
-            to: account,
-            subject: 'Verify Your Account',
-            html: ` <h2> ${firstname}, Thank you for signing up </h2>
-                    <h4> Please verify your mail to continue </h4>
-                  <p>Please click this link to verify yourself. <a href="${url}">${url}</a></p>
-            `
-        }
+    // const mailOptions = {
+    //         from: `FPL HUB <${config.emailUser}>`,
+    //         to: account,
+    //         subject: 'Verify Your Account',
+    //         html: ` <h2> ${firstname}, Thank you for signing up </h2>
+    //                 <h4> Please verify your mail to continue </h4>
+    //               <p>Please click this link to verify yourself. <a href="${url}">${url}</a></p>
+    //         `
+    //     }
 
-        nodemailer.Transport(mailOptions)
+    //     nodemailer.Transport(mailOptions)
 
     // await sendgrid.emailService(qMessage)
     // await publish('email.notification', qMessage)
@@ -45,8 +45,6 @@ exports.register = async(req, res) => {
         message: 'Account created successfully.',
         data: user
     })
-
-    
 }
 
 
@@ -127,6 +125,7 @@ exports.resendEmail = async (req, res) => {
         message: 'OTP sent successfully.'
     })
 }
+
 exports.login = async (req, res) => {
     const {account, password} = req.body
     const query = account.indexOf('@') === -1 ? {phone: account}  : {email: account}
