@@ -12,7 +12,7 @@ const user = new Schema({
     fullname: String,
     email: {type: String},
     phone_number: Number,
-    username: {type: Mixed},
+    username: Schema.Types.Mixed,
     password: String,
     account_verified: Boolean,
     account_verified_at: Date,
