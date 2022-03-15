@@ -127,7 +127,7 @@ exports.resendEmail = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-    const {account, password} = req.body
+    const {fullname, account, phone_number, username, password} = req.body
     const query = account.indexOf('@') === -1 ? {phone: account}  : {email: account}
     const user = await User.findOne(query).lean().exec()
     if (user) {
@@ -143,7 +143,10 @@ exports.login = async (req, res) => {
             return responseHandler.sendSuccess(res, {
                 message: 'Login Successfully.',
                 data: {
+                    fullname,
                     user,
+                    phone_number,
+                    username,
                     access_token: token,
                     refresh_token: token
                 }
