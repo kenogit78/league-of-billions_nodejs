@@ -6,7 +6,7 @@ const check = async (d) => {
     const q = d.indexOf('@') == -1 ? {phone: d} : {email: d}
     const user = await User.findOne(q).exec()
     if (user) {
-        throw Error('email|phone already exists.')
+        throw Error('email already exists.')
     }
 }
 
