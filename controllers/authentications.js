@@ -12,7 +12,7 @@ const config = require('../config')
 exports.register = async(req, res) => {
     const {fullname, email, phone_number, username, password} = req.body
     const passwordHash = User.getHashPassword(password)
-    let user = await User.create({fullname, email, phone_number, password: passwordHash})
+    let user = await User.create({fullname, email, phone_number, username, password: passwordHash})
     const otp = User.getOTP()
     let account = email 
     // const notification = email ? 'email' : 'sms'

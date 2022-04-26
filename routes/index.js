@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
     return res.send('API is Running...')
 })
 router.use('/auth', authRoutes);
-router.use('/post', postRoutes)
+router.use('/api/post', postRoutes)
 // router.use('/user', userRoutes);
 
 module.exports = router
