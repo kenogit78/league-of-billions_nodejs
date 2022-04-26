@@ -83,7 +83,7 @@ exports.likePost = async(req, res) => {
     }else{
       await post.updateOne({ $pull: { likes: req.body.userId } });
       return responseHandler.sendSuccess(res, {
-        message: "The post has been unliked",
+        message: "The post has been disliked",
         status: 201,
         data: post.likes
       })
@@ -93,29 +93,29 @@ exports.likePost = async(req, res) => {
   }
 }
 
-exports.dislikePost = async(req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post.likes.includes(req.body.userId)) {
-      await post.updateOne({ $push: { dislikes: req.body.userId } });
-      // res.status(200).json("The post has been liked");
-      return responseHandler.sendSuccess(res, {
-        message: "The post has been disliked",
-        status: 201,
-        data: post.dislikes
-      })
-    }else{
-      await post.updateOne({ $pull: { dislikes: req.body.userId } });
-      return responseHandler.sendSuccess(res, {
-        message: "The post has been undisliked",
-        status: 201,
-        data: post.dislikes
-      })
-    }
-  } catch (err) {
-    res.status(500).json(err);
-  }
-}
+// exports.dislikePost = async(req, res) => {
+//   try {
+//     const post = await Post.findById(req.params.id);
+//     if (!post.likes.includes(req.body.userId)) {
+//       await post.updateOne({ $push: { dislikes: req.body.userId } });
+//       // res.status(200).json("The post has been liked");
+//       return responseHandler.sendSuccess(res, {
+//         message: "The post has been disliked",
+//         status: 201,
+//         data: post.dislikes
+//       })
+//     }else{
+//       await post.updateOne({ $pull: { dislikes: req.body.userId } });
+//       return responseHandler.sendSuccess(res, {
+//         message: "The post has been undisliked",
+//         status: 201,
+//         data: post.dislikes
+//       })
+//     }
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// }
 
 
 // exports.commentPost = 
