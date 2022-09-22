@@ -1,24 +1,18 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
-      required: true,
+      // required: true,
     },
     desc: {
       type: String,
       required: true,
       max: 500,
     },
-    img: {
-      type: Array,
-    },
+    img: [String],
     likes: {
-      type: Array,
-      default: [],
-    },
-    dislikes: {
       type: Array,
       default: [],
     },
@@ -34,4 +28,4 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Post", PostSchema);
+module.exports = mongoose.model('Post', PostSchema);

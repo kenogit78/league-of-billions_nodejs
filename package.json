@@ -4,7 +4,8 @@
   "description": "FPL league space",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon server.js",
+    "start:prod": "export NODE_ENV=production&& nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Odizee and Paul Keno",
@@ -15,18 +16,38 @@
     "amqplib": "^0.8.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
     "helmet": "^5.0.2",
+    "html-to-text": "^8.2.1",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^6.2.1",
     "mongoose-paginate-v2": "^1.6.2",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "node-mailjet": "^3.3.7",
-    "nodemailer": "^6.7.2",
+    "nodemailer": "^6.7.8",
     "nodemon": "^2.0.15",
-    "uuid": "^8.3.2"
+    "path": "^0.12.7",
+    "pug": "^3.0.2",
+    "sharp": "^0.31.0",
+    "sib-api-v3-sdk": "^8.4.2",
+    "uuid": "^8.3.2",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.23.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-next": "^12.3.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.8",
+    "prettier": "^2.7.1"
   }
 }
