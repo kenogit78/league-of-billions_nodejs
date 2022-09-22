@@ -5,9 +5,9 @@ const authController = require('../../controllers/authentications');
 
 const postController = require('../../controllers/post');
 
-router.get('/', postController.getAllPosts);
-
 router.use(authController.protect);
+
+router.get('/', postController.getAllPosts);
 
 router.post('/new', postController.makePost);
 
