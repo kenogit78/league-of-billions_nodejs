@@ -20,8 +20,15 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const signRefreshToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+  });
+};
+
+const createSendToken = async (user, statusCode, res, type) => {
   const token = signToken(user._id);
+  const refreshToken = signRefreshToken(user._id);
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -30,7 +37,11 @@ const createSendToken = (user, statusCode, res) => {
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
-  res.cookie('jwt', token, cookieOptions);
+  user.refreshToken = refreshToken;
+  const result = await user.save();
+  // console.log(result);
+
+  res.cookie('jwt', refreshToken, cookieOptions);
 
   //Remove password from output
   user.password = undefined;
@@ -38,6 +49,7 @@ const createSendToken = (user, statusCode, res) => {
   res.status(statusCode).json({
     status: 'success',
     token,
+    // refreshToken,
     data: {
       user,
     },
@@ -48,6 +60,7 @@ exports.register = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     fullname: req.body.fullname,
     email: req.body.email,
+    username: req.body.username,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
@@ -56,6 +69,26 @@ exports.register = catchAsync(async (req, res, next) => {
   await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
+
+exports.refresh = async (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(401);
+  const refreshToken = cookies.jwt;
+
+  const foundUser = await User.findOne({ refreshToken }).exec();
+
+  if (!foundUser) return res.sendStatus(403); //Forbidden
+  // evaluate jwt
+  jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
+    console.log(foundUser.id);
+
+    if (err || foundUser.id !== decoded.id) return res.sendStatus(403);
+    const accessToken = jwt.sign({ id: decoded._id }, process.env.JWT_SECRET, {
+      expiresIn: '30s',
+    });
+    res.json({ accessToken });
+  });
+};
 
 exports.userEmailVerify = async (req, res) => {
   const { id } = jwt.verify(req.params.token, process.env.SECRET_KEY);
@@ -164,7 +197,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError(`Incorrect email or password`, 401));
   }
   // 3) If everything is okay, send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, res, 'login');
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -175,6 +208,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -264,7 +299,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 4) Log the user in, send JWT
   createSendToken(user, 200, res);
-  console.log(passwordResetToken);
+  // console.log(passwordResetToken);
 });
 
 exports.changePassword = catchAsync(async (req, res, next) => {

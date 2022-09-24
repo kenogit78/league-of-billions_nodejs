@@ -26,7 +26,11 @@ const userSchema = new Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
-    username: Schema.Types.Mixed,
+    username: {
+      type: String,
+      unique: true,
+      required: [true, 'Please provide your username'],
+    },
     club: {
       type: String,
     },
@@ -34,6 +38,7 @@ const userSchema = new Schema(
       type: String,
       default: 'default.jpg',
     },
+    refreshToken: String,
     password: {
       type: String,
       required: [true, 'Please provide a password'],
@@ -42,7 +47,7 @@ const userSchema = new Schema(
     },
     passwordConfirm: {
       type: String,
-      required: [true, 'Please confirm password'],
+      // required: [true, 'Please confirm password'],
       validate: {
         validator: function (el) {
           return el === this.password;
