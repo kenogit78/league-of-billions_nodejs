@@ -25,7 +25,12 @@ app.set('view engine', 'pug');
 // 1) GLOBAL MIDDLEWARES
 // Set security HTTP headers
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: ['http://localhost:3000', 'https://fplhub.vercel.app/'],
+  })
+);
 
 //Development logging
 if (process.env.NODE_ENV === 'development') {
