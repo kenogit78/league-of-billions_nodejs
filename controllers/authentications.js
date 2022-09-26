@@ -40,7 +40,7 @@ const createSendToken = async (user, statusCode, res, type) => {
 
   user.refreshToken = refreshToken;
   const result = await user.save();
-  console.log(user);
+  // console.log(user);
 
   res.cookie('jwt', refreshToken, cookieOptions);
 
@@ -82,13 +82,13 @@ exports.refresh = async (req, res) => {
   if (!user) return res.sendStatus(403); //Forbidden
   // evaluate jwt
   jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
-    console.log(user.id);
+    // console.log(user.id);
 
     if (err || user.id !== decoded.id) return res.sendStatus(403);
-    const accessToken = jwt.sign({ id: decoded._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: decoded._id }, process.env.JWT_SECRET, {
       expiresIn: '5000s',
     });
-    res.json({ accessToken, user });
+    res.json({ token, user });
   });
 };
 
@@ -221,7 +221,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   //   // 2) Verify token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
+  // console.log(decoded);
   //   // 3) Check if user still exists
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
