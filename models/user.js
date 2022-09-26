@@ -38,7 +38,10 @@ const userSchema = new Schema(
       type: String,
       default: 'default.jpg',
     },
-    refreshToken: String,
+    refreshToken: {
+      type: String,
+      select: false,
+    },
     password: {
       type: String,
       required: [true, 'Please provide a password'],

@@ -24,6 +24,7 @@ const signRefreshToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
   });
+  Forbidden;
 };
 
 const createSendToken = async (user, statusCode, res, type) => {
@@ -39,12 +40,13 @@ const createSendToken = async (user, statusCode, res, type) => {
 
   user.refreshToken = refreshToken;
   const result = await user.save();
-  // console.log(result);
+  console.log(user);
 
   res.cookie('jwt', refreshToken, cookieOptions);
 
   //Remove password from output
   user.password = undefined;
+  user.refreshToken = undefined;
 
   res.status(statusCode).json({
     status: 'success',
@@ -75,18 +77,18 @@ exports.refresh = async (req, res) => {
   if (!cookies?.jwt) return res.sendStatus(401);
   const refreshToken = cookies.jwt;
 
-  const foundUser = await User.findOne({ refreshToken }).exec();
+  const user = await User.findOne({ refreshToken }).select({ refreshToken: 0 });
 
-  if (!foundUser) return res.sendStatus(403); //Forbidden
+  if (!user) return res.sendStatus(403); //Forbidden
   // evaluate jwt
   jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
-    console.log(foundUser.id);
+    console.log(user.id);
 
-    if (err || foundUser.id !== decoded.id) return res.sendStatus(403);
+    if (err || user.id !== decoded.id) return res.sendStatus(403);
     const accessToken = jwt.sign({ id: decoded._id }, process.env.JWT_SECRET, {
-      expiresIn: '30s',
+      expiresIn: '5000s',
     });
-    res.json({ accessToken });
+    res.json({ accessToken, user });
   });
 };
 
