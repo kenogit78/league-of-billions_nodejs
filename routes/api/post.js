@@ -9,7 +9,12 @@ router.use(authController.protect);
 
 router.get('/', postController.getAllPosts);
 
-router.post('/new', postController.makePost);
+router.post(
+  '/new',
+  postController.uploadPostImages,
+  postController.resizePostImages,
+  postController.makePost
+);
 
 router
   .route('/:id')

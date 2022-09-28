@@ -85,9 +85,10 @@ exports.refresh = async (req, res) => {
     // console.log(user.id);
 
     if (err || user.id !== decoded.id) return res.sendStatus(403);
-    const token = jwt.sign({ id: decoded._id }, process.env.JWT_SECRET, {
-      expiresIn: '5000s',
+    const token = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
+    console.log(token);
     res.json({ token, user });
   });
 };

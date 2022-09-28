@@ -7,6 +7,7 @@ const { response } = require('../utils/response');
 const catchAsync = require('../utils/catchAsync');
 const multer = require('multer');
 const sharp = require('sharp');
+const AppError = require('../utils/appError');
 
 /* MULTER */
 const multerStorage = multer.memoryStorage();
@@ -27,15 +28,15 @@ const upload = multer({
 exports.uploadPostImages = upload.array('img', 3);
 
 exports.resizePostImages = catchAsync(async (req, res, next) => {
-  console.log(req.files);
-
   if (!req.files) return next();
 
   req.body.img = [];
 
   await Promise.all(
     req.files.map(async (file, i) => {
-      const filename = `post-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+      const filename = `post-${file.originalname.split('.')[0]}-${Date.now()}-${
+        i + 1
+      }.jpeg`;
 
       await sharp(file.buffer)
         .resize(2000, 1333)

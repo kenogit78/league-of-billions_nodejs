@@ -28,7 +28,11 @@ app.use(helmet());
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:3000', 'https://fplhub.vercel.app/'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://fplhub.vercel.app/',
+    ],
   })
 );
 
