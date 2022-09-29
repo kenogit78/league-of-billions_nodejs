@@ -60,7 +60,8 @@ exports.editPost = factory.updateOne(Post);
 
 exports.deletePost = catchAsync(async (req, res) => {
   const post = await Post.findById(req.params.id);
-  if (post.userId === req.body.userId) {
+  console.log(post.userId, req.user);
+  if (post.userId === req.user.id) {
     await post.deleteOne();
     // res.status(200).json("the post has been deleted");
     res.status(204).json({
