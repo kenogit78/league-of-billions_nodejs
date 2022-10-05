@@ -8,6 +8,12 @@ const catchAsync = require('../utils/catchAsync');
 const multer = require('multer');
 const sharp = require('sharp');
 const AppError = require('../utils/appError');
+const cloudinary = require('../utils/cloudinary');
+const DatauriParser = require('datauri/parser');
+const path = require('path');
+
+/* DATA URI */
+const parser = new DatauriParser();
 
 /* MULTER */
 const multerStorage = multer.memoryStorage();
@@ -29,22 +35,35 @@ exports.uploadPostImages = upload.array('img', 3);
 
 exports.resizePostImages = catchAsync(async (req, res, next) => {
   if (!req.files) return next();
-
+  console.log(req);
   req.body.img = [];
+  req.body.cloudinary_id = [];
 
   await Promise.all(
     req.files.map(async (file, i) => {
+      console.log('req.file object', file);
+      const extName = path.extname(file.originalname).toString();
+      const file64 = parser.format(extName, file.buffer);
+
+      console.log(file64);
       const filename = `post-${file.originalname.split('.')[0]}-${Date.now()}-${
         i + 1
       }.jpeg`;
 
-      await sharp(file.buffer)
-        .resize(2000, 1333)
-        .toFormat('jpeg')
-        .jpeg({ quality: 90 })
-        .toFile(`public/image/posts/${filename}`);
+      // await sharp(file.buffer)
+      //   .resize(2000, 1333)
+      //   .toFormat('jpeg')
+      //   .jpeg({ quality: 90 })
+      //   .toFile(`public/image/posts/${filename}`);
 
-      req.body.img.push(filename);
+      await cloudinary.uploader.upload(file64.content, function (result) {
+        req.body.img.push(result.secure_url);
+        req.body.cloudinary_id.push(result.public_id);
+
+        console.log(result);
+      });
+
+      // req.body.img.push(filename);
     })
   );
 
@@ -63,9 +82,13 @@ exports.deletePost = catchAsync(async (req, res) => {
   console.log(post.userId, req.user);
   if (post.userId === req.user.id) {
     await post.deleteOne();
+
+    // DELETE IMAGES FROM CLOUDINARY
+    await cloudinary.api.delete_resources(post.cloudinary_id);
     // res.status(200).json("the post has been deleted");
     res.status(204).json({
       status: 'success',
+
       data: null,
     });
   } else {

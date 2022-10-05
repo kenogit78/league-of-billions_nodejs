@@ -14,11 +14,13 @@ module.exports = class Email {
     if (process.env.NODE_ENV === 'production') {
       // Sendgrid
       return nodemailer.createTransport({
-        service: 'SendGrid',
+        // service: 'SendGrid',
+        host: 'smtp-relay.sendinblue.com',
+        port: 587,
         auth: {
           type: 'login',
-          user: process.env.SENGRID_USERNAME,
-          pass: process.env.SENDGRID_PASSWORD,
+          user: process.env.SENDINBLUE_USERNAME,
+          pass: process.env.SENDINBLUE_PASSWORD,
         },
       });
     }

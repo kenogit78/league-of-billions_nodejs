@@ -11,6 +11,7 @@ const PostSchema = new mongoose.Schema(
       required: true,
       max: 500,
     },
+    cloudinary_id: [String],
     img: [String],
     likes: {
       type: Array,

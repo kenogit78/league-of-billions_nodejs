@@ -23,6 +23,7 @@ router.post(
 );
 router.post('/resend/', validate(resendEmail), authController.resendEmail);
 router.post('/login', authController.login);
+router.get('/logout', authController.logout);
 router.get('/refresh', authController.refresh);
 router.post('/password/forgot', authController.forgotPassword);
 router.patch('/password/reset/:token', authController.resetPassword);
