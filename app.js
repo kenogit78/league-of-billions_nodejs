@@ -31,8 +31,7 @@ app.use(
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://league-of-billions.up.railway.app/',
-      'https://fplhub.vercel.app/',
+      'https://fplhub.vercel.app',
     ],
   })
 );
