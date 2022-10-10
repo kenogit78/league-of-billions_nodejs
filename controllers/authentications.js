@@ -215,6 +215,7 @@ exports.logout = (req, res) => {
     httpOnly: true,
     sameSite: 'none',
     overwrite: true,
+    secure: true,
   });
   res.status(200).json({ status: 'success' });
   // res.clearCookie('jwt');
