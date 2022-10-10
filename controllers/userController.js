@@ -4,21 +4,17 @@ const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 const multer = require('multer');
 const sharp = require('sharp');
-
+const cloudinary = require('../utils/cloudinary');
+const path = require('path');
+const DataURIParser = require('datauri/parser');
 /****
  * MULTER
  ****/
 
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'public/image/users');
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split('/')[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   },
-// });
+/* DATA URI */
+const parser = new DataURIParser();
 
+/* MULTER */
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
@@ -38,17 +34,46 @@ exports.uploadUserPhoto = upload.single('photo');
 
 /* RESIZE PHOTO */
 
+// exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
+//   if (!req.file) return next();
+
+//   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+
+//   await sharp(req.file.buffer)
+//     .resize(500, 500)
+//     .toFormat('jpeg')
+//     .jpeg({ quality: 90 })
+//     .toFile(`public/image/users/${req.file.filename}`);
+
+//   next();
+// });
+
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
+  console.log(req.file);
 
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+  // await Promise.all(
+  // req.files.map(async (file, i) => {
+  // console.log('req.file object', file);
+  const extName = path.extname(req.file.originalname).toString();
+  const file64 = parser.format(extName, req.file.buffer);
 
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/image/users/${req.file.filename}`);
+  console.log(file64);
+  const filename = `post-${
+    req.file.originalname.split('.')[0]
+  }-${Date.now()}-${+1}.jpeg`;
 
+  await cloudinary.uploader.upload(file64.content, function (result) {
+    req.file.filename = result.secure_url;
+    req.file.cloudinary_id = result.public_id;
+
+    console.log(result);
+  });
+
+  // })
+  // );
+
+  console.log();
   next();
 });
 
@@ -90,8 +115,25 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   }
 
   // 2) Filtered out unwanted fields names that are not allowed to be updated
-  const filteredBody = filterObj(req.body, 'fullname', 'email');
-  if (req.file) filteredBody.photo = req.file.filename;
+  const filteredBody = filterObj(
+    req.body,
+    'fullname',
+    'email',
+    'username',
+    'fplteam'
+  );
+
+  const user = await User.findById(req.user.id);
+
+  console.log(user);
+
+  if (req.file) {
+    cloudinary.uploader.destroy(user.cloudinary_id, function (error, result) {
+      console.log(result, error);
+    });
+    filteredBody.photo = req.file.filename;
+    filteredBody.cloudinary_id = req.file.cloudinary_id;
+  }
   // 3) Update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
@@ -102,6 +144,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       user: updatedUser,
+      message: 'Updated successfully',
     },
   });
 });

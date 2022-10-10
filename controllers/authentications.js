@@ -35,6 +35,7 @@ const createSendToken = async (user, statusCode, res, type) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
+    //On localhost, you comment out sameSite for cookies to be set in broswer
     sameSite: 'none',
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
@@ -75,10 +76,12 @@ exports.register = catchAsync(async (req, res, next) => {
 
 exports.refresh = async (req, res) => {
   const cookies = req.cookies;
+  console.log(cookies);
   if (!cookies?.jwt) return res.sendStatus(401);
   const refreshToken = cookies.jwt;
 
   const user = await User.findOne({ refreshToken }).select({ refreshToken: 0 });
+  console.log(refreshToken);
 
   if (!user) return res.sendStatus(403); //Forbidden
   // evaluate jwt
@@ -200,6 +203,8 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError(`Incorrect email or password`, 401));
   }
+
+  console.log(user);
   // 3) If everything is okay, send token to client
   createSendToken(user, 200, res, 'login');
 });

@@ -25,8 +25,28 @@ const PostSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: [true, 'post must belong to a user'],
+    },
+  },
+  {
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: { virtuals: true },
   },
   { timestamps: true }
 );
+
+PostSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: 'name photo username',
+  });
+
+  next();
+});
 
 module.exports = mongoose.model('Post', PostSchema);

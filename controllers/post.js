@@ -79,16 +79,19 @@ exports.editPost = factory.updateOne(Post);
 
 exports.deletePost = catchAsync(async (req, res) => {
   const post = await Post.findById(req.params.id);
-  console.log(post.userId, req.user);
-  if (post.userId === req.user.id) {
+  // console.log(post);
+
+  // console.log(post.cloudinary_id.length);
+  if (post.user.id === req.user.id) {
     await post.deleteOne();
 
     // DELETE IMAGES FROM CLOUDINARY
-    await cloudinary.api.delete_resources(post.cloudinary_id);
+    if (post.cloudinary_id.length > 0) {
+      await cloudinary.api.delete_resources(post.cloudinary_id);
+    }
     // res.status(200).json("the post has been deleted");
     res.status(204).json({
       status: 'success',
-
       data: null,
     });
   } else {

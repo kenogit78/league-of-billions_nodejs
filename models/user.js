@@ -38,6 +38,10 @@ const userSchema = new Schema(
       type: String,
       default: 'default.jpg',
     },
+    cloudinary_id: String,
+    fplteam: {
+      type: String,
+    },
     refreshToken: {
       type: String,
       select: false,
