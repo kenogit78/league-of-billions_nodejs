@@ -36,7 +36,7 @@ const createSendToken = async (user, statusCode, res, type) => {
     ),
     httpOnly: true,
     //On localhost, you comment out sameSite for cookies to be set in broswer
-    sameSite: 'none',
+    // sameSite: 'none',
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
@@ -213,9 +213,10 @@ exports.logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
-    sameSite: 'none',
+    //Comment out when in development
+    // sameSite: 'none',
     overwrite: true,
-    secure: true,
+    // secure: true,
   });
   res.status(200).json({ status: 'success' });
   // res.clearCookie('jwt');

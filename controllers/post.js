@@ -58,7 +58,7 @@ exports.resizePostImages = catchAsync(async (req, res, next) => {
 
       await cloudinary.uploader.upload(file64.content, function (result) {
         req.body.img.push(result.secure_url);
-        req.body.cloudinary_id.push(result.public_id);
+        req.body.cloudinary_id.push(result?.public_id);
 
         console.log(result);
       });

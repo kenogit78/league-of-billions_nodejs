@@ -50,7 +50,7 @@ exports.uploadUserPhoto = upload.single('photo');
 
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
-  console.log(req.file);
+  // console.log(req.file);
 
   // await Promise.all(
   // req.files.map(async (file, i) => {
@@ -58,17 +58,19 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   const extName = path.extname(req.file.originalname).toString();
   const file64 = parser.format(extName, req.file.buffer);
 
-  console.log(file64);
+  // console.log(file64);
   const filename = `post-${
     req.file.originalname.split('.')[0]
   }-${Date.now()}-${+1}.jpeg`;
 
-  await cloudinary.uploader.upload(file64.content, function (result) {
-    req.file.filename = result.secure_url;
-    req.file.cloudinary_id = result.public_id;
+  await cloudinary.uploader
+    .upload(file64.content, { width: 2000, height: 1000, crop: 'limit' })
+    .then((result) => {
+      req.file.filename = result.secure_url;
+      req.file.cloudinary_id = result?.public_id;
 
-    console.log(result);
-  });
+      console.log(result);
+    });
 
   // })
   // );
@@ -125,7 +127,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   const user = await User.findById(req.user.id);
 
-  console.log(user);
+  // console.log(user);
 
   if (req.file) {
     cloudinary.uploader.destroy(user.cloudinary_id, function (error, result) {
