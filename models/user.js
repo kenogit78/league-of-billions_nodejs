@@ -38,7 +38,7 @@ const userSchema = new Schema(
       type: String,
       default: 'default.jpg',
     },
-    cloudinary_id: String,
+    cloudinary_id: { type: String, default: 'cloudinarydefault' },
     fplteam: {
       type: String,
     },
