@@ -36,7 +36,7 @@ const createSendToken = async (user, statusCode, res, type) => {
     ),
     httpOnly: true,
     //On localhost, you comment out sameSite for cookies to be set in broswer
-    sameSite: 'none',
+    sameSite: 'Lax',
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
@@ -215,7 +215,7 @@ exports.logout = (req, res) => {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
     //Comment out when in development
-    sameSite: 'none',
+    sameSite: 'Lax',
     overwrite: true,
     secure: true,
   });
