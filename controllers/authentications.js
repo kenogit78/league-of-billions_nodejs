@@ -37,7 +37,7 @@ const createSendToken = async (user, statusCode, res, type) => {
     httpOnly: true,
     //On localhost, you comment out sameSite for cookies to be set in broswer
     sameSite: 'Lax',
-    domain: 'https://league-of-billions.up.railway.app/',
+    domain: 'league-of-billions.up.railway.app',
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
@@ -218,7 +218,7 @@ exports.logout = (req, res) => {
     //Comment sameSite out when in development
     sameSite: 'Lax',
     overwrite: true,
-    domain: 'https://league-of-billions.up.railway.app/',
+    domain: 'league-of-billions.up.railway.app',
     secure: true,
   });
   res.status(200).json({ status: 'success' });
