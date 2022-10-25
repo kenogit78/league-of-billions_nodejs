@@ -1,24 +1,19 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema(
   {
     userId: {
       type: String,
-      required: true,
+      // required: true,
     },
     desc: {
       type: String,
       required: true,
       max: 500,
     },
-    img: {
-      type: Array,
-    },
+    cloudinary_id: [String],
+    img: [String],
     likes: {
-      type: Array,
-      default: [],
-    },
-    dislikes: {
       type: Array,
       default: [],
     },
@@ -30,8 +25,28 @@ const PostSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: [true, 'post must belong to a user'],
+    },
+  },
+  {
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: { virtuals: true },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Post", PostSchema);
+PostSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: 'name photo username',
+  });
+
+  next();
+});
+
+module.exports = mongoose.model('Post', PostSchema);
